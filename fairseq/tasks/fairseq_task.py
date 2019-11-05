@@ -24,7 +24,7 @@ class FairseqTask(object):
     def __init__(self, args):
         self.args = args
         self.datasets = {}
-        self.epoch_iter = None
+        self.dataset_to_epoch_iter = {}
 
     @classmethod
     def load_dictionary(cls, filename):
@@ -120,7 +120,6 @@ class FairseqTask(object):
                 (default: 0).
             epoch (int, optional): the epoch to start the iterator from
                 (default: 0).
-
         Returns:
             ~fairseq.iterators.EpochBatchIterator: a batched iterator over the
                 given dataset split
@@ -128,8 +127,8 @@ class FairseqTask(object):
         # For default fairseq task, return same iterator across epochs
         # as datasets are not dynamic, can be overridden in task specific
         # setting.
-        if self.epoch_iter is not None:
-            return self.epoch_iter
+        if dataset in self.dataset_to_epoch_iter:
+            return self.dataset_to_epoch_iter[dataset]
 
         assert isinstance(dataset, FairseqDataset)
 
@@ -153,7 +152,7 @@ class FairseqTask(object):
         )
 
         # return a reusable, sharded iterator
-        self.epoch_iter = iterators.EpochBatchIterator(
+        epoch_iter = iterators.EpochBatchIterator(
             dataset=dataset,
             collate_fn=dataset.collater,
             batch_sampler=batch_sampler,
@@ -163,7 +162,8 @@ class FairseqTask(object):
             num_workers=num_workers,
             epoch=epoch,
         )
-        return self.epoch_iter
+        self.dataset_to_epoch_iter[dataset] = epoch_iter
+        return epoch_iter
 
     def build_model(self, args):
         """
@@ -198,8 +198,12 @@ class FairseqTask(object):
             from fairseq.sequence_scorer import SequenceScorer
             return SequenceScorer(self.target_dictionary)
         else:
-            from fairseq.sequence_generator import SequenceGenerator
-            return SequenceGenerator(
+            from fairseq.sequence_generator import SequenceGenerator, SequenceGeneratorWithAlignment
+            if getattr(args, 'print_alignment', False):
+                seq_gen_cls = SequenceGeneratorWithAlignment
+            else:
+                seq_gen_cls = SequenceGenerator
+            return seq_gen_cls(
                 self.target_dictionary,
                 beam_size=getattr(args, 'beam', 5),
                 max_len_a=getattr(args, 'max_len_a', 0),

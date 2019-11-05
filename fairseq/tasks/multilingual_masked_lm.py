@@ -110,7 +110,7 @@ class MultiLingualMaskedLMTask(FairseqTask):
         smoothed_prob = smoothed_prob / smoothed_prob.sum()
         return smoothed_prob
 
-    def load_dataset(self, split, epoch=0, combine=False):
+    def load_dataset(self, split, epoch=0, combine=False, **kwargs):
         """Load a given dataset split.
 
         Args:
@@ -286,7 +286,7 @@ class MultiLingualMaskedLMTask(FairseqTask):
     ):
         # Recreate epoch iterator every epoch cause the underlying
         # datasets are dynamic due to sampling.
-        self.epoch_iter = None
+        self.dataset_to_epoch_iter = None
         return super().get_batch_iterator(
             dataset, max_tokens, max_sentences, max_positions,
             ignore_invalid_inputs, required_batch_size_multiple,
