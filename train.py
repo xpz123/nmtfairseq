@@ -18,7 +18,7 @@ from fairseq import checkpoint_utils, distributed_utils, options, progress_bar, 
 from fairseq.data import iterators
 from fairseq.trainer import Trainer
 from fairseq.meters import AverageMeter, StopwatchMeter
-
+import pdb
 
 def main(args, init_distributed=False):
     utils.import_user_module(args)
@@ -39,7 +39,7 @@ def main(args, init_distributed=False):
 
     # Print args
     print(args)
-
+    pdb.set_trace()
     # Setup task, e.g., translation, language modeling, etc.
     task = tasks.setup_task(args)
 
