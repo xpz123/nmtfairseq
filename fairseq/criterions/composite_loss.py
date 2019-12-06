@@ -7,7 +7,7 @@ from torch import nn
 
 from fairseq import utils
 from . import FairseqCriterion, register_criterion
-
+import pdb
 
 @register_criterion('composite_loss')
 class CompositeLoss(FairseqCriterion):
