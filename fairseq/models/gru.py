@@ -233,8 +233,8 @@ class GRUEncoder(FairseqEncoder):
         else:
             state_size = self.num_layers, bsz, self.hidden_size
         h0 = x.new_zeros(*state_size)
-        c0 = x.new_zeros(*state_size)
-        packed_outs, (final_hiddens, final_cells) = self.gru(packed_x, (h0, c0))
+        #c0 = x.new_zeros(*state_size)
+        packed_outs, final_hiddens = self.gru(packed_x, h0)
 
         # unpack outputs and apply dropout
         x, _ = nn.utils.rnn.pad_packed_sequence(packed_outs, padding_value=self.padding_value)
@@ -248,12 +248,12 @@ class GRUEncoder(FairseqEncoder):
                 return out.view(self.num_layers, bsz, -1)
 
             final_hiddens = combine_bidir(final_hiddens)
-            final_cells = combine_bidir(final_cells)
+            #final_cells = combine_bidir(final_cells)
 
         encoder_padding_mask = src_tokens.eq(self.padding_idx).t()
 
         return {
-            'encoder_out': (x, final_hiddens, final_cells),
+            'encoder_out': (x, final_hiddens),
             'encoder_padding_mask': encoder_padding_mask if encoder_padding_mask.any() else None
         }
 
@@ -331,9 +331,10 @@ class GRUDecoder(FairseqIncrementalDecoder):
         self.encoder_output_units = encoder_output_units
         if encoder_output_units != hidden_size:
             self.encoder_hidden_proj = Linear(encoder_output_units, hidden_size)
-            self.encoder_cell_proj = Linear(encoder_output_units, hidden_size)
+            #self.encoder_cell_proj = Linear(encoder_output_units, hidden_size)
         else:
-            self.encoder_hidden_proj = self.encoder_cell_proj = None
+            #self.encoder_hidden_proj = self.encoder_cell_proj = None
+            self.encoder_hidden_proj = None
         self.layers = nn.ModuleList([
             GRUCell(
                 input_size=hidden_size + embed_dim if layer == 0 else hidden_size,
@@ -375,7 +376,7 @@ class GRUDecoder(FairseqIncrementalDecoder):
         bsz, seqlen = prev_output_tokens.size()
 
         # get outputs from encoder
-        encoder_outs, encoder_hiddens, encoder_cells = encoder_out[:3]
+        encoder_outs, encoder_hiddens = encoder_out[:2]
         srclen = encoder_outs.size(0)
 
         # embed tokens
@@ -388,14 +389,15 @@ class GRUDecoder(FairseqIncrementalDecoder):
         # initialize previous states (or get from cache during incremental generation)
         cached_state = utils.get_incremental_state(self, incremental_state, 'cached_state')
         if cached_state is not None:
-            prev_hiddens, prev_cells, input_feed = cached_state
+            #prev_hiddens, prev_cells, input_feed = cached_state
+            prev_hiddens, input_feed = cached_state
         else:
             num_layers = len(self.layers)
             prev_hiddens = [encoder_hiddens[i] for i in range(num_layers)]
-            prev_cells = [encoder_cells[i] for i in range(num_layers)]
+            #prev_cells = [encoder_cells[i] for i in range(num_layers)]
             if self.encoder_hidden_proj is not None:
                 prev_hiddens = [self.encoder_hidden_proj(x) for x in prev_hiddens]
-                prev_cells = [self.encoder_cell_proj(x) for x in prev_cells]
+                #prev_cells = [self.encoder_cell_proj(x) for x in prev_cells]
             input_feed = x.new_zeros(bsz, self.hidden_size)
 
         attn_scores = x.new_zeros(srclen, seqlen, bsz)
@@ -406,14 +408,15 @@ class GRUDecoder(FairseqIncrementalDecoder):
 
             for i, rnn in enumerate(self.layers):
                 # recurrent cell
-                hidden, cell = rnn(input, (prev_hiddens[i], prev_cells[i]))
+                #hidden, cell = rnn(input, (prev_hiddens[i], prev_cells[i]))
+                hidden = rnn(input, prev_hiddens[i])
 
                 # hidden state becomes the input to the next layer
                 input = F.dropout(hidden, p=self.dropout_out, training=self.training)
 
                 # save state for next time step
                 prev_hiddens[i] = hidden
-                prev_cells[i] = cell
+                #prev_cells[i] = cell
 
             # apply attention using the last layer's hidden state
             if self.attention is not None:
@@ -431,7 +434,7 @@ class GRUDecoder(FairseqIncrementalDecoder):
         # cache previous states (no-op except during incremental generation)
         utils.set_incremental_state(
             self, incremental_state, 'cached_state',
-            (prev_hiddens, prev_cells, input_feed),
+            (prev_hiddens, input_feed),
         )
 
         # collect outputs across time steps

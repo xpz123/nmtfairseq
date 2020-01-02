@@ -1,0 +1,1 @@
+CUDA_VISIBLE_DEVICES=0  python train.py mydata/data-bin/charZh_wordEn --arch gru_small --save-dir checkpoints/ZhEn_lstm/um_charWord_exp11 --log-interval 1000 --no-progress-bar --log-format simple --optimizer adam --lr 0.002  --max-tokens 4096 --lr-scheduler inverse_sqrt --warmup-init-lr 1e-07 --warmup-updates 4000 
