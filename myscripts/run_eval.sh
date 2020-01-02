@@ -112,10 +112,24 @@
 #CUDA_VISIBLE_DEVICES=2 python generate.py mydata/data-bin/wordTi_wordZh_v2 --task translation --log-format simple --log-interval 10 --path checkpoints/wordWord_exp15/checkpoint_best.pt --batch-size 1 --beam 5 --remove-bpe --results-path temp --lenpen 0.6 --max-len-a 1 --max-len-b 50
 
 #--------Exp16------------------
-CUDA_VISIBLE_DEVICES=3 python generate.py mydata/data-bin/charTi_charZh_v2 --task translation --log-format simple --log-interval 10 --path checkpoints/charChar_exp16/checkpoint_last.pt --batch-size 64 --beam 5 --remove-bpe --results-path temp --lenpen 0.6 --max-len-a 1 --max-len-b 50
+#CUDA_VISIBLE_DEVICES=3 python generate.py mydata/data-bin/charTi_charZh_v2 --task translation --log-format simple --log-interval 10 --path checkpoints/charChar_exp16/checkpoint_last.pt --batch-size 64 --beam 5 --remove-bpe --results-path temp --lenpen 0.6 --max-len-a 1 --max-len-b 50
 
 #CUDA_VISIBLE_DEVICES=3 python generate.py mydata/data-bin/charTi_wordZh_v2 --task translation --log-format simple --log-interval 10 --path checkpoints/charWord_exp16/checkpoint_last.pt --batch-size 64 --beam 5 --remove-bpe --results-path temp --lenpen 0.6 --max-len-a 1 --max-len-b 50
 
 #CUDA_VISIBLE_DEVICES=3 python generate.py mydata/data-bin/wordTi_wordZh_v2 --task translation --log-format simple --log-interval 10 --path checkpoints/wordWord_exp16/checkpoint_last.pt --batch-size 1 --beam 5 --remove-bpe --results-path temp --lenpen 0.6 --max-len-a 1 --max-len-b 50
+
+#--------Exp17------------------
+#CUDA_VISIBLE_DEVICES=3 python generate.py mydata/data-bin/charTi_charZh_v2 --task translation --log-format simple --log-interval 10 --path checkpoints/charChar_exp17/checkpoint_last.pt --batch-size 64 --beam 5 --remove-bpe --results-path temp --lenpen 0.6 --max-len-a 1 --max-len-b 50
+
+#CUDA_VISIBLE_DEVICES=3 python generate.py mydata/data-bin/charTi_wordZh_v2 --task translation --log-format simple --log-interval 10 --path checkpoints/charWord_exp17/checkpoint_last.pt --batch-size 64 --beam 5 --remove-bpe --results-path temp --lenpen 0.6 --max-len-a 1 --max-len-b 50
+
+#CUDA_VISIBLE_DEVICES=3 python generate.py mydata/data-bin/wordTi_wordZh_v2 --task translation --log-format simple --log-interval 10 --path checkpoints/wordWord_exp17/checkpoint_last.pt --batch-size 1 --beam 5 --remove-bpe --results-path temp --lenpen 0.6 --max-len-a 1 --max-len-b 50
+
+#--------Exp18------------------
+#CUDA_VISIBLE_DEVICES=3 python generate.py mydata/data-bin/charTi_charZh_v2 --task translation --log-format simple --log-interval 10 --path checkpoints/charChar_exp18/checkpoint_last.pt --batch-size 64 --beam 5 --remove-bpe --results-path temp --lenpen 0.6 --max-len-a 1 --max-len-b 50
+
+#CUDA_VISIBLE_DEVICES=3 python generate.py mydata/data-bin/charTi_wordZh_v2 --task translation --log-format simple --log-interval 10 --path checkpoints/charWord_exp18/checkpoint_last.pt --batch-size 64 --beam 5 --remove-bpe --results-path temp --lenpen 0.6 --max-len-a 1 --max-len-b 50
+
+CUDA_VISIBLE_DEVICES=3 python generate.py mydata/data-bin/wordTi_wordZh_v2 --task translation --log-format simple --log-interval 10 --path checkpoints/wordWord_exp18/checkpoint_last.pt --batch-size 1 --beam 5 --remove-bpe --results-path temp --lenpen 0.6 --max-len-a 1 --max-len-b 50
 
 
